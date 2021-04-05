@@ -8,17 +8,31 @@ import "../css/app.scss"
 // in "webpack.config.js".
 //
 // Import deps with the dep name or local files with a relative path, for example:
-//
-import { Socket } from "phoenix"
-import socket from "./socket"
+// //
+// import { Socket } from "phoenix"
+// import socket from "./socket"
 //
 import "phoenix_html"
-// import { Socket } from "phoenix"
+import { Socket } from "phoenix"
 import topbar from "topbar"
 import { LiveSocket } from "phoenix_live_view"
+import mapboxgl from 'mapbox-gl'
+
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
-let liveSocket = new LiveSocket("/live", Socket, { params: { _csrf_token: csrfToken } })
+let Hooks = {}
+Hooks.MapHook = {
+  mounted() {
+    const map = new mapboxgl.Map({
+      container: 'map_live_div',
+      style: 'http://localhost:8085/styles/klokantech-basic/style.json',
+      center: [28.8638, 47.0105],
+      zoom: 11
+    });
+  }
+}
+
+let liveSocket = new LiveSocket("/live", Socket, { params: { _csrf_token: csrfToken }, hooks: Hooks })
 
 // Show progress bar on live navigation and form submits
 topbar.config({ barColors: { 0: "#29d" }, shadowColor: "rgba(0, 0, 0, .3)" })
