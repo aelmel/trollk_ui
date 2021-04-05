@@ -29,6 +29,40 @@ Hooks.MapHook = {
       center: [28.8638, 47.0105],
       zoom: 11
     });
+    var url = 'https://wanderdrone.appspot.com/';
+
+    map.on('load', function () {
+
+
+    });
+
+    const handleEvent = ({ tevent }) => {
+      console.log(tevent)
+      if (map.getSource(tevent.board) == undefined) {
+        var dd = { 'type': 'Point', 'coordinates': [tevent.longitude, tevent.latitude] }
+
+        map.addSource(tevent.board, { type: 'geojson', data: dd });
+        map.addLayer({
+          'id': tevent.board,
+          'type': 'circle',
+          'source': tevent.board,
+          'paint': {
+            'circle-radius': 8,
+            'circle-color': '#007cbf'
+          }
+        });
+        return
+      }
+      var dd = { 'type': 'Point', 'coordinates': [tevent.longitude, tevent.latitude] }
+
+      map.getSource(tevent.board).setData(dd)
+      // map.flyTo({
+      //   center: [tevent.longitude, tevent.latitude],
+      //   speed: 0.5
+      // });
+    }
+
+    this.handleEvent("new_coordinates", handleEvent)
   }
 }
 

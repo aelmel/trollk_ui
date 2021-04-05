@@ -16,9 +16,10 @@ defmodule TrollkUi.Trollk.SocketClient do
   end
 
   def init(connection_details) do
-    url = Keyword.get(connection_details, :url)
+    url = "ws://localhost:4040/socket/websocket"
     topic = Keyword.get(connection_details, :topic)
-    {:connect, url, [], %{first_join: true, ping_ref: 1, topic: topic}}
+    pid = Keyword.get(connection_details, :live_pid)
+    {:connect, url, [], %{first_join: true, ping_ref: 1, topic: topic, live_pid: pid}}
   end
 
   def handle_connected(transport, state) do
@@ -50,8 +51,9 @@ defmodule TrollkUi.Trollk.SocketClient do
     {:ok, state}
   end
 
-  def handle_message(topic, event, payload, _transport, state) do
-    Logger.warn("message on topic #{topic}: #{event} #{inspect(payload)}")
+  def handle_message(topic, event, payload, _transport, %{live_pid: pid} = state) do
+    Logger.debug("message on topic #{topic}: #{event} #{inspect(payload)}")
+    Kernel.send(pid, payload)
     {:ok, state}
   end
 
@@ -61,7 +63,7 @@ defmodule TrollkUi.Trollk.SocketClient do
   end
 
   def handle_reply(topic, _ref, payload, _transport, state) do
-    Logger.warn("reply on topic #{topic}: #{inspect(payload)}")
+    Logger.info("reply on topic #{topic}: #{inspect(payload)}")
     {:ok, state}
   end
 
