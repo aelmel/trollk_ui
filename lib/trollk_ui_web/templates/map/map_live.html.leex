@@ -1,7 +1,9 @@
 
 <div class="row">
   <div class="column column-20">
-    Test
+    <%= for route <- @routes do %>
+      <%= get_route_button(route) %>
+    <% end %>
   </div>
   <div class="column column-80">
     <div id="map_live_div" phx-hook="MapHook"></div>
