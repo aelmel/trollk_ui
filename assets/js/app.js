@@ -27,15 +27,14 @@ Hooks.MapHook = {
       container: 'map_live_div',
       style: 'http://localhost:8085/styles/klokantech-basic/style.json',
       center: [28.8638, 47.0105],
-      zoom: 11
+      zoom: 12
     });
-    var url = 'https://wanderdrone.appspot.com/';
 
     map.on('load', function () {
 
 
     });
-
+    //map.addControl(new mapboxgl.FullscreenControl());
     const handleEvent = ({ tevent }) => {
       console.log(tevent)
       if (map.getSource(tevent.board) == undefined) {

@@ -3,8 +3,9 @@ defmodule TrollkUiWeb.MapLive do
   @topic "route:8"
 
   def mount(_params, _session, socket) do
-    {:ok, _} = TrollkUi.Trollk.SocketClient.start_link([live_pid: self(), topic: @topic])
-    {:ok, socket}
+    routes = Trollk.Routes.Api.get_routes()
+    # {:ok, _} = TrollkUi.Trollk.SocketClient.start_link(live_pid: self(), topic: @topic)
+    {:ok, assign(socket, :routes, routes)}
   end
 
   def render(assigns) do
@@ -14,6 +15,4 @@ defmodule TrollkUiWeb.MapLive do
   def handle_info(event, socket) do
     {:noreply, push_event(socket, "new_coordinates", %{tevent: event})}
   end
-
-
 end

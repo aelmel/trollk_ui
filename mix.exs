@@ -45,6 +45,7 @@ defmodule TrollkUi.MixProject do
       {:jason, "~> 1.1"},
       {:plug_cowboy, "~> 2.0"},
       {:phoenix_gen_socket_client, "~> 3.2.1"},
+      {:httpoison, "~> 1.8"},
       {:websocket_client, "~> 1.3"}
     ]
   end
