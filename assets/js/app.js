@@ -17,6 +17,7 @@ import { Socket } from "phoenix"
 import topbar from "topbar"
 import { LiveSocket } from "phoenix_live_view"
 import mapboxgl from 'mapbox-gl'
+import osmtogeojson from 'osmtogeojson'
 
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
@@ -36,7 +37,7 @@ Hooks.MapHook = {
     });
     //map.addControl(new mapboxgl.FullscreenControl());
     const handleEvent = ({ tevent }) => {
-      console.log(tevent)
+      // console.log(tevent)
       if (map.getSource(tevent.board) == undefined) {
         var dd = { 'type': 'Point', 'coordinates': [tevent.longitude, tevent.latitude] }
 
@@ -61,7 +62,35 @@ Hooks.MapHook = {
       // });
     }
 
-    this.handleEvent("new_coordinates", handleEvent)
+    const handleSegment = ({ segment, route }) => {
+      var result = osmtogeojson(JSON.parse(segment));
+      var route_line = `routeline-${route}`
+      var route_line_id = `routeline-segment-${route}`
+
+      map.addSource(route_line, {
+        'type': 'geojson',
+        'data': result
+      });
+      map.addLayer({
+        'id': route_line_id,
+        'type': 'line',
+        'source': route_line,
+        'layout': {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        'paint': {
+          'line-color': '#888',
+          'line-width': 8
+        }
+      });
+    }
+
+
+    this.handleEvent("route_segment", handleSegment);
+    this.handleEvent("new_coordinates", handleEvent);
+
+
   }
 }
 

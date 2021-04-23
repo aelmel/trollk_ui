@@ -14,16 +14,31 @@ defmodule TrollkUiWeb.MapLive do
 
   def handle_event("subscribe", %{"route-topic" => route_topic}, socket) do
     Logger.info("Subscribe to route #{route_topic}")
+    {:ok, _} = TrollkUi.Trollk.SocketClient.start_link(live_pid: self(), topic: route_topic)
+    case Trollk.Routes.Api.get_details(route_topic) do
+      {:ok, segment} ->
+        Logger.debug("got segment")
+        {:noreply, push_event(socket, "route_segment", %{segment: segment, route: route_topic})}
 
-    case TrollkUi.Trollk.SocketClient.start_link(live_pid: self(), topic: route_topic) do
-      {:ok, _} ->
-        Logger.debug("Subscribe succesfully")
-
-      ex ->
-        Logger.warn("error received on subscribe #{inspect(ex)}")
+      _ ->
+        {:noreply, socket}
     end
 
-    {:noreply, socket}
+    # case TrollkUi.Trollk.SocketClient.start_link(live_pid: self(), topic: route_topic) do
+    #   {:ok, _} ->
+    #     Logger.debug("Subscribe succesfully")
+    #     case Trollk.Routes.Api.get_details(route_topic) do
+    #       {:ok, segment} ->
+    #         Logger.debug("got segment")
+    #         {:noreply, push_event(socket, "route_segment", %{segment: segment})}
+    #       _ ->
+    #         {:noreply, socket}
+    #     end
+    #   ex ->
+    #     Logger.warn("error received on subscribe #{inspect(ex)}")
+    # end
+
+    # {:noreply, socket}
   end
 
   def handle_info(event, socket) do

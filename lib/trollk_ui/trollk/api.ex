@@ -20,7 +20,10 @@ defmodule Trollk.Routes.Api do
       {:ok, %{status_code: 200, body: body}} ->
         case Jason.decode(body) do
           {:ok, details} ->
-            details
+            coordinates =
+              details
+              |> Map.get("segment", %{})
+              |> Jason.encode()
 
           err ->
             Logger.warn("cannot parse json #{inspect(err)}")
