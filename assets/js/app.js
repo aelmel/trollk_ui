@@ -16,7 +16,7 @@ import "phoenix_html"
 import { Socket } from "phoenix"
 import topbar from "topbar"
 import { LiveSocket } from "phoenix_live_view"
-import mapboxgl from 'mapbox-gl'
+import maplibre from 'maplibre-gl'
 import osmtogeojson from 'osmtogeojson'
 
 
@@ -24,7 +24,7 @@ let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("
 let Hooks = {}
 Hooks.MapHook = {
   mounted() {
-    const map = new mapboxgl.Map({
+    const map = new maplibre.Map({
       container: 'map_live_div',
       style: 'http://localhost:8085/styles/klokantech-basic/style.json',
       center: [28.8638, 47.0105],
@@ -138,4 +138,3 @@ liveSocket.connect()
 // >> liveSocket.enableLatencySim(1000)  // enabled for duration of browser session
 // >> liveSocket.disableLatencySim()
 window.liveSocket = liveSocket
-
