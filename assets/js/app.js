@@ -35,9 +35,38 @@ Hooks.MapHook = {
 
 
     });
+
+    var lightenDarkenColor = function (col, amt) {
+      var usePound = false;
+      if (col[0] == "#") {
+        col = col.slice(1);
+        usePound = true;
+      }
+      var num = parseInt(col, 16);
+      var r = (num >> 16) + amt;
+      if (r > 255) {
+        r = 255;
+      } else if (r < 0) {
+        r = 0;
+      }
+      var b = ((num >> 8) & 0x00FF) + amt;
+      if (b > 255) {
+        b = 255;
+      } else if (b < 0) {
+        b = 0;
+      }
+      var g = (num & 0x0000FF) + amt;
+      if (g > 255) {
+        g = 255;
+      } else if (g < 0) {
+        g = 0;
+      }
+      return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16);
+    }
+
     //map.addControl(new mapboxgl.FullscreenControl());
     const handleEvent = ({ tevent }) => {
-      // console.log(tevent)
+
       if (map.getSource(tevent.board) == undefined) {
         var dd = { 'type': 'Point', 'coordinates': [tevent.longitude, tevent.latitude] }
 
@@ -48,7 +77,7 @@ Hooks.MapHook = {
           'source': tevent.board,
           'paint': {
             'circle-radius': 8,
-            'circle-color': '#007cbf'
+            'circle-color': tevent.color
           }
         });
         return
@@ -62,7 +91,7 @@ Hooks.MapHook = {
       // });
     }
 
-    const handleSegment = ({ segment, route }) => {
+    const handleSegment = ({ segment, route, color }) => {
       var result = osmtogeojson(JSON.parse(segment));
       var route_line = `routeline-${route}`
       var route_line_id = `routeline-segment-${route}`
@@ -80,8 +109,8 @@ Hooks.MapHook = {
           'line-cap': 'round'
         },
         'paint': {
-          'line-color': '#888',
-          'line-width': 8
+          'line-color': lightenDarkenColor(color, 50),
+          'line-width': 8,
         }
       });
     }

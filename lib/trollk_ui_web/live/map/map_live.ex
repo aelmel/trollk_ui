@@ -12,13 +12,14 @@ defmodule TrollkUiWeb.MapLive do
     Phoenix.View.render(TrollkUiWeb.MapView, "map_live.html", assigns)
   end
 
-  def handle_event("subscribe", %{"route-topic" => route_topic}, socket) do
+  def handle_event("subscribe", %{"route-topic" => route_topic, "route-color" => color}, socket) do
     Logger.info("Subscribe to route #{route_topic}")
-    {:ok, _} = TrollkUi.Trollk.SocketClient.start_link(live_pid: self(), topic: route_topic)
+    {:ok, _} = TrollkUi.Trollk.SocketClient.start_link(live_pid: self(), topic: route_topic, color: color)
+
     case Trollk.Routes.Api.get_details(route_topic) do
       {:ok, segment} ->
         Logger.debug("got segment")
-        {:noreply, push_event(socket, "route_segment", %{segment: segment, route: route_topic})}
+        {:noreply, push_event(socket, "route_segment", %{segment: segment, route: route_topic, color: color})}
 
       _ ->
         {:noreply, socket}
