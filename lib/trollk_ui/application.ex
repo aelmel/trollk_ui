@@ -12,10 +12,9 @@ defmodule TrollkUi.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: TrollkUi.PubSub},
       # Start the Endpoint (http/https)
-      TrollkUiWeb.Endpoint,
+      TrollkUiWeb.Endpoint
       # Start a worker by calling: TrollkUi.Worker.start_link(arg)
       # {TrollkUi.Worker, arg}
-
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
