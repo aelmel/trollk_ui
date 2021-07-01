@@ -16,11 +16,14 @@ defmodule TrollkUi.Trollk.SocketClient do
   end
 
   def init(connection_details) do
-    url = "ws://localhost:4040/socket/websocket"
+    host = Application.get_env(:trollk_ui, :trollk_base_host)
+    url = "ws://#{host}/socket/websocket"
     topic = Keyword.get(connection_details, :topic)
     pid = Keyword.get(connection_details, :live_pid)
     color = Keyword.get(connection_details, :color)
-    {:connect, url, [], %{first_join: true, ping_ref: 1, topic: topic, live_pid: pid, color: color}}
+
+    {:connect, url, [],
+     %{first_join: true, ping_ref: 1, topic: topic, live_pid: pid, color: color}}
   end
 
   def handle_connected(transport, state) do

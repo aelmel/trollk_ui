@@ -21,12 +21,13 @@ import osmtogeojson from 'osmtogeojson'
 
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
+
 let Hooks = {}
 Hooks.MapHook = {
   mounted() {
     const map = new maplibre.Map({
       container: 'map_live_div',
-      style: 'http://localhost:8085/styles/klokantech-basic/style.json',
+      style: process.env.BASE_URL,
       center: [28.8638, 47.0105],
       zoom: 12
     });
@@ -153,7 +154,6 @@ Hooks.MapHook = {
         }
       });
     }
-
 
     this.handleEvent("route_segment", handleSegment);
     this.handleEvent("new_coordinates", handleEvent);

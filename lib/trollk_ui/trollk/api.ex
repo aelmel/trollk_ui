@@ -5,11 +5,13 @@ defmodule Trollk.Routes.Api do
   require Logger
 
   def get_routes() do
-    call("http://localhost:4040/api/details/routes")
+    host = Application.get_env(:trollk_ui, :trollk_base_host)
+    call("http://#{host}/api/details/routes")
   end
 
   def get_details("route:" <> route_number) do
-    "http://localhost:4040/api/details/route/#{route_number}"
+    host = Application.get_env(:trollk_ui, :trollk_base_host)
+    "http://#{host}/api/details/route/#{route_number}"
     |> call()
     |> Map.get("segment", %{})
     |> Jason.encode()
