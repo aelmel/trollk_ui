@@ -8,3 +8,6 @@ config :trollk_ui, TrollkUiWeb.Endpoint,
 
 # Print only warnings and errors during test
 config :logger, level: :warn
+
+config :trollk_ui,
+  trollk_base_host: "localhost:4040"

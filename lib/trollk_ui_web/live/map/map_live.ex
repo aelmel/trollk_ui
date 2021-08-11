@@ -3,9 +3,15 @@ defmodule TrollkUiWeb.MapLive do
   require Logger
 
   def mount(_params, _session, socket) do
-    routes = Trollk.Routes.Api.get_routes()
+    case Trollk.Routes.Api.get_routes() do
+      {:error, message} ->
+        {:ok, assign(socket, routes: [], routes_error: message)}
+
+      routes ->
+        {:ok, assign(socket, :routes, routes)}
+    end
+
     # {:ok, _} = TrollkUi.Trollk.SocketClient.start_link(live_pid: self(), topic: @topic)
-    {:ok, assign(socket, :routes, routes)}
   end
 
   def render(assigns) do

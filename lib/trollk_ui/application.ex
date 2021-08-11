@@ -5,7 +5,7 @@ defmodule TrollkUi.Application do
 
   use Application
 
-  def start(_type, _args) do
+  def start(_type, args) do
     children = [
       # Start the Telemetry supervisor
       TrollkUiWeb.Telemetry,
@@ -16,6 +16,16 @@ defmodule TrollkUi.Application do
       # Start a worker by calling: TrollkUi.Worker.start_link(arg)
       # {TrollkUi.Worker, arg}
     ]
+
+    children =
+      case args do
+        [env: :test] ->
+          children ++
+            [{Plug.Cowboy, schema: :http, plug: Trollk.MockServer, options: [port: 8081]}]
+
+        _ ->
+          children
+      end
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
