@@ -129,6 +129,7 @@ Hooks.MapHook = {
         'icon-rotate',
         tevent.direction
       );
+      map.moveLayer(boardLayer.id);
     }
 
     const handleSegment = ({ segment, route, color }) => {
