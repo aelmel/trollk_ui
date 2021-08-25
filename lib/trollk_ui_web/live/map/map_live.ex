@@ -3,9 +3,15 @@ defmodule TrollkUiWeb.MapLive do
   require Logger
 
   def mount(_params, _session, socket) do
-    routes = Trollk.Routes.Api.get_routes()
+    case Trollk.Routes.Api.get_routes() do
+      {:error, message} ->
+        {:ok, assign(socket, routes: [], routes_error: message)}
+
+      routes ->
+        {:ok, assign(socket, :routes, routes)}
+    end
+
     # {:ok, _} = TrollkUi.Trollk.SocketClient.start_link(live_pid: self(), topic: @topic)
-    {:ok, assign(socket, :routes, routes)}
   end
 
   def render(assigns) do
@@ -14,12 +20,16 @@ defmodule TrollkUiWeb.MapLive do
 
   def handle_event("subscribe", %{"route-topic" => route_topic, "route-color" => color}, socket) do
     Logger.info("Subscribe to route #{route_topic}")
-    {:ok, _} = TrollkUi.Trollk.SocketClient.start_link(live_pid: self(), topic: route_topic, color: color)
+
+    {:ok, _} =
+      TrollkUi.Trollk.SocketClient.start_link(live_pid: self(), topic: route_topic, color: color)
 
     case Trollk.Routes.Api.get_details(route_topic) do
       {:ok, segment} ->
         Logger.debug("got segment")
-        {:noreply, push_event(socket, "route_segment", %{segment: segment, route: route_topic, color: color})}
+
+        {:noreply,
+         push_event(socket, "route_segment", %{segment: segment, route: route_topic, color: color})}
 
       _ ->
         {:noreply, socket}

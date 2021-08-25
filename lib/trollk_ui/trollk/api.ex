@@ -4,18 +4,34 @@ defmodule Trollk.Routes.Api do
   """
   require Logger
 
+  @base_url Application.get_env(:trollk_ui, :trollk_base_host)
+
   def get_routes() do
-    call("http://localhost:4040/api/details/routes")
+    host =
+      case get_call("http://#{@base_url}/api/details/routes") do
+        {:error, _} ->
+          {:error, "Cannot get routes details"}
+
+        response ->
+          response
+      end
   end
 
   def get_details("route:" <> route_number) do
-    "http://localhost:4040/api/details/route/#{route_number}"
-    |> call()
-    |> Map.get("segment", %{})
-    |> Jason.encode()
+    host = Application.get_env(:trollk_ui, :trollk_base_host)
+
+    case get_call("http://#{@base_url}/api/details/route/#{route_number}") do
+      {:error, _} ->
+        {:error, "Cannot get details for route #{route_number}"}
+
+      response ->
+        response
+        |> Map.get("segment", %{})
+        |> Jason.encode()
+    end
   end
 
-  defp call(url, headers \\ []) do
+  defp get_call(url, headers \\ []) do
     case HTTPoison.get(url, headers) do
       {:ok, %{status_code: 200, body: body}} ->
         case Jason.decode(body) do
@@ -24,11 +40,12 @@ defmodule Trollk.Routes.Api do
 
           err ->
             Logger.warn("cannot parse json #{inspect(err)}")
+            {:error, "Got wrong format"}
         end
 
       {:ok, %{status_code: status_code}} ->
         Logger.warn("Error code from server #{status_code}")
-        {:error, "Cannot fetch details"}
+        {:error, "Cannot fetch details with status_code #{status_code}"}
 
       ex ->
         Logger.warn("Internal error #{inspect(ex)}")
